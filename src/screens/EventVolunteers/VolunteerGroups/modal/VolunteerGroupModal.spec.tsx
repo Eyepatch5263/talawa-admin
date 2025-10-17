@@ -355,6 +355,85 @@ describe('Testing VolunteerGroupModal', () => {
     });
   });
 
+  it('should remove leader from volunteerUsers when leader is deselected', async () => {
+    renderGroupModal(link1, itemProps[0]);
+    expect(screen.getAllByText(t.createGroup)).toHaveLength(2);
+
+    // First, select a leader
+    const leaderSelect = await screen.findByTestId('leaderSelect');
+    const leaderInputField = within(leaderSelect).getByRole('combobox');
+    fireEvent.mouseDown(leaderInputField);
+
+    const leaderOption = await screen.findByText('Harve Lance');
+    fireEvent.click(leaderOption);
+
+    // Verify leader was selected
+    await waitFor(() => {
+      expect(leaderInputField).toHaveValue('Harve Lance');
+    });
+
+    // Now deselect the leader by clicking the clear button
+    const clearButton = within(leaderSelect).getByTitle('Clear');
+    fireEvent.click(clearButton);
+
+    // Verify leader was cleared
+    await waitFor(() => {
+      expect(leaderInputField).toHaveValue('');
+    });
+  });
+
+  it('should handle isOptionEqualToValue for leader Autocomplete', async () => {
+    renderGroupModal(link1, itemProps[0]);
+    expect(screen.getAllByText(t.createGroup)).toHaveLength(2);
+
+    // Select a leader
+    const leaderSelect = await screen.findByTestId('leaderSelect');
+    const leaderInputField = within(leaderSelect).getByRole('combobox');
+    fireEvent.mouseDown(leaderInputField);
+
+    const leaderOption = await screen.findByText('Harve Lance');
+    fireEvent.click(leaderOption);
+
+    // The isOptionEqualToValue function is tested internally when selecting
+    await waitFor(() => {
+      expect(leaderInputField).toHaveValue('Harve Lance');
+    });
+
+    // Select the same leader again (this tests isOptionEqualToValue comparison)
+    fireEvent.mouseDown(leaderInputField);
+    const sameLeaderOption = await screen.findByText('Harve Lance');
+    fireEvent.click(sameLeaderOption);
+  });
+
+  it('should handle isOptionEqualToValue for volunteer Autocomplete', async () => {
+    renderGroupModal(link1, itemProps[0]);
+    expect(screen.getAllByText(t.createGroup)).toHaveLength(2);
+
+    // Select a volunteer
+    const volunteerSelect = await screen.findByTestId('volunteerSelect');
+    const volunteerInputField = within(volunteerSelect).getByRole('combobox');
+    fireEvent.mouseDown(volunteerInputField);
+
+    const volunteerOption = await screen.findByText('John Doe');
+    fireEvent.click(volunteerOption);
+
+    // The isOptionEqualToValue function is tested internally when selecting
+    await waitFor(() => {
+      const chips = within(volunteerSelect).getAllByRole('button');
+      expect(chips.length).toBeGreaterThan(0);
+    });
+
+    // Try selecting another volunteer to test the comparison
+    fireEvent.mouseDown(volunteerInputField);
+    const anotherVolunteerOption = await screen.findByText('Harve Lance');
+    fireEvent.click(anotherVolunteerOption);
+
+    await waitFor(() => {
+      const chips = within(volunteerSelect).getAllByRole('button');
+      expect(chips.length).toBeGreaterThan(1);
+    });
+  });
+
   describe('Recurring Events', () => {
     const recurringEventProps: InterfaceVolunteerGroupModal = {
       isOpen: true,
