@@ -300,8 +300,6 @@ describe('Testing VolunteerCreateModal', () => {
 
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalled();
-        // After successful submission, applyTo should reset to 'series'
-        // This is tested indirectly through the code path
       });
     });
   });
